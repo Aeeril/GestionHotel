@@ -18,7 +18,7 @@ builder.Services.AddScoped<IUtilisateurRepository, UtilisateurRepository>();
 builder.Services.AddScoped<ReservationService>();
 
 // Swagger + Controllers
-builder.Services.AddControllers(); // 👈 Important pour activer les [ApiController]
+builder.Services.AddControllers(); // 👈 Nécessaire pour activer [ApiController]
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -32,12 +32,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseAuthorization(); // Si tu prévois d'ajouter de la sécurité
+app.UseAuthorization();
 
-// Controller endpoints (comme ChambresController, etc.)
-app.MapControllers(); // 👈 Active les routes des contrôleurs
+// Active les routes des contrôleurs
+app.MapControllers();
 
-// Endpoint direct (comme POST /api/reservations)
+// Endpoint minimal pour réserver
 app.MapPost("/api/reservations", async (
     ReservationService service,
     GestionHotel.Application.DTOs.ReservationRequestDto dto) =>
@@ -46,5 +46,49 @@ app.MapPost("/api/reservations", async (
     return Results.Ok(result);
 });
 
-app.Run();
+// Endpoint minimal pour annuler une réservation
+app.MapPost("/api/reservations/annuler/{id:int}", async (
+    ReservationService service,
+    int id) =>
+{
+    await service.AnnulerReservationAsync(id, true, false);
+    return Results.Ok("Réservation annulée.");
+});
 
+// Endpoint pour annuler une réservation en tant que réceptionniste
+app.MapPost("/api/reservations/annuler-par-reception", async (
+    ReservationService service,
+    int reservationId,
+    bool rembourser) =>
+{
+    await service.AnnulerReservationAsync(reservationId, demandeParClient: false, forcerRemboursement: rembourser);
+    return Results.Ok("Réservation annulée par la réception.");
+});
+
+// Endpoint pour le check-in
+app.MapPost("/api/reservations/checkin", async (
+    ReservationService service,
+    GestionHotel.Application.DTOs.CheckInRequestDto dto) =>
+{
+    await service.CheckInAsync(dto);
+    return Results.Ok("Check-in effectué avec succès.");
+});
+
+// Endpoint pour le check-out
+app.MapPost("/api/reservations/checkout", async (
+    ReservationService service,
+    GestionHotel.Application.DTOs.CheckOutRequestDto dto) =>
+{
+    await service.CheckOutAsync(dto.ReservationId);
+    return Results.Ok("Check-out effectué avec succès.");
+});
+
+// Endpoint pour obtenir toutes les réservations actives
+app.MapGet("/api/reservations/actives", async (
+    ReservationService service) =>
+{
+    var actives = await service.GetReservationsActivesAsync();
+    return Results.Ok(actives);
+});
+
+app.Run();

@@ -45,5 +45,31 @@ namespace GestionHotel.Infrastructure.Repositories
                     r.Statut != StatutReservation.Annulee)
                 .ToListAsync();
         }
+
+        public async Task AnnulerReservationAsync(int reservationId, bool demandeParClient, bool forcerRemboursement)
+        {
+            var reservation = await _context.Reservations.FindAsync(reservationId);
+
+            if (reservation == null)
+                throw new Exception("Réservation introuvable.");
+
+            var delaiAnnulation = (reservation.DateDebut - DateTime.Now).TotalHours;
+
+            var remboursable = forcerRemboursement || (demandeParClient && delaiAnnulation >= 48);
+
+            // Logique simulée de remboursement
+
+            reservation.Statut = StatutReservation.Annulee;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Reservation>> GetAllAsync()
+        {
+            return await _context.Reservations
+                .Include(r => r.Client)
+                .Include(r => r.Chambres)
+                .Include(r => r.Paiement)
+                .ToListAsync();
+        }
     }
 }

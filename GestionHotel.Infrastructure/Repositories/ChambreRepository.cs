@@ -16,10 +16,12 @@ namespace GestionHotel.Infrastructure.Repositories
 
         public async Task<List<Chambre>> GetChambresDisponibles(DateTime dateDebut, DateTime dateFin)
         {
-            var chambresReservees = _context.Reservations
-                .Where(r => r.DateDebut < dateFin && r.DateFin > dateDebut)
+            var chambresReservees = await _context.Reservations
+                .Where(r =>
+                    (dateDebut < r.DateFin && dateFin > r.DateDebut)) // chevauchement
                 .SelectMany(r => r.Chambres)
-                .Select(c => c.Id);
+                .Select(c => c.Id)
+                .ToListAsync();
 
             return await _context.Chambres
                 .Where(c => !chambresReservees.Contains(c.Id))
@@ -57,5 +59,10 @@ namespace GestionHotel.Infrastructure.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<List<Chambre>> GetChambresDisponiblesAvecEtat(DateTime dateDebut, DateTime dateFin)
+        {
+            return await GetChambresDisponibles(dateDebut, dateFin);
+        }
+
     }
 }
