@@ -1,7 +1,6 @@
 using GestionHotel.Domain.Entities;
 using GestionHotel.Application.DTOs;
 using System.Threading.Tasks;
-using GestionHotel.Domain.Entities;
 
 
 namespace GestionHotel.Application.Interfaces

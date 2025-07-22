@@ -1,3 +1,5 @@
+using GestionHotel.Apis.Endpoints.Menage;
+using GestionHotel.Application.Interfaces;
 using GestionHotel.Application.Services;
 using GestionHotel.Domain.Interfaces;
 using GestionHotel.Infrastructure.Data;
@@ -16,6 +18,7 @@ builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IUtilisateurRepository, UtilisateurRepository>();
 builder.Services.AddScoped<ReservationService>();
+builder.Services.AddScoped<IMenageService, MenageService>();
 
 // Swagger + Controllers
 builder.Services.AddControllers(); // 👈 Nécessaire pour activer [ApiController]
@@ -90,5 +93,7 @@ app.MapGet("/api/reservations/actives", async (
     var actives = await service.GetReservationsActivesAsync();
     return Results.Ok(actives);
 });
+
+app.MapMenageEndpoints();
 
 app.Run();

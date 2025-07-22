@@ -112,6 +112,7 @@ namespace GestionHotel.Application.Services
             foreach (var chambre in reservation.Chambres)
             {
                 chambre.Etat = EtatChambre.ARefaire;
+                chambre.EstPropre = false;
                 await _chambreRepo.UpdateAsync(chambre);
             }
 

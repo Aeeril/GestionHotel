@@ -64,5 +64,9 @@ namespace GestionHotel.Infrastructure.Repositories
             return await GetChambresDisponibles(dateDebut, dateFin);
         }
 
+        public async Task<IEnumerable<Chambre>> GetChambresNonPropresAsync()
+        {
+            return await _context.Chambres.Where(c => !c.EstPropre).ToListAsync();
+        }
     }
 }
