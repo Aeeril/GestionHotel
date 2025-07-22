@@ -91,5 +91,56 @@ namespace GestionHotel.Application.Services
             await _reservationRepo.UpdateAsync(reservation);
         }
 
+        public async Task CheckInAsync(CheckInRequestDto dto)
+        {
+            var reservation = await _reservationRepo.GetByIdAsync(dto.ReservationId);
+            if (reservation == null)
+                throw new Exception("Réservation introuvable.");
+
+            reservation.EstCheckIn = true;
+            reservation.PaiementEffectue = dto.PaiementEffectue;
+
+            await _reservationRepo.UpdateAsync(reservation);
+        }
+
+        public async Task CheckOutAsync(int reservationId)
+        {
+            var reservation = await _reservationRepo.GetByIdAsync(reservationId);
+            if (reservation == null)
+                throw new Exception("Réservation introuvable.");
+
+            foreach (var chambre in reservation.Chambres)
+            {
+                chambre.Etat = EtatChambre.ARefaire;
+                await _chambreRepo.UpdateAsync(chambre);
+            }
+
+            if (!reservation.PaiementEffectue)
+            {
+                reservation.Paiement ??= new Paiement();
+                reservation.Paiement.Montant = reservation.Chambres.Sum(c => c.Tarif);
+                reservation.Paiement.DatePaiement = DateTime.Now;
+                reservation.Paiement.EstEffectue = true;
+                reservation.PaiementEffectue = true;
+            }
+
+            reservation.Statut = StatutReservation.Terminee;
+
+            await _reservationRepo.UpdateAsync(reservation);
+        }
+
+        public async Task<List<Reservation>> GetReservationsActivesAsync()
+        {
+            var aujourdHui = DateTime.Today;
+
+            var toutes = await _reservationRepo.GetAllAsync();
+
+            return toutes
+                .Where(r =>
+                    (r.Statut == StatutReservation.EnCours || r.Statut == StatutReservation.Confirmee) &&
+                    r.DateDebut.Date <= aujourdHui &&
+                    r.DateFin.Date >= aujourdHui)
+                .ToList();
+        }
     }
 }

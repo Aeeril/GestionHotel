@@ -62,5 +62,14 @@ namespace GestionHotel.Infrastructure.Repositories
             reservation.Statut = StatutReservation.Annulee;
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<Reservation>> GetAllAsync()
+        {
+            return await _context.Reservations
+                .Include(r => r.Client)
+                .Include(r => r.Chambres)
+                .Include(r => r.Paiement)
+                .ToListAsync();
+        }
     }
 }

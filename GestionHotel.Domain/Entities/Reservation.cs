@@ -16,5 +16,9 @@ namespace GestionHotel.Domain.Entities
         public StatutReservation Statut { get; set; } = StatutReservation.EnCours;
 
         public Paiement? Paiement { get; set; }
+
+        public bool EstCheckIn { get; set; }
+        public bool PaiementEffectue { get; set; }
+        
     }
 }

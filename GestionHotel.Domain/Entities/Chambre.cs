@@ -36,5 +36,6 @@ namespace GestionHotel.Domain.Entities
 
         [Required]
         public EtatChambre Etat { get; set; }
+        
     }
 }

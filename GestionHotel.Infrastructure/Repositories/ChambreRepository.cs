@@ -59,5 +59,10 @@ namespace GestionHotel.Infrastructure.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<List<Chambre>> GetChambresDisponiblesAvecEtat(DateTime dateDebut, DateTime dateFin)
+        {
+            return await GetChambresDisponibles(dateDebut, dateFin);
+        }
+
     }
 }

@@ -55,4 +55,40 @@ app.MapPost("/api/reservations/annuler/{id:int}", async (
     return Results.Ok("Réservation annulée.");
 });
 
+// Endpoint pour annuler une réservation en tant que réceptionniste
+app.MapPost("/api/reservations/annuler-par-reception", async (
+    ReservationService service,
+    int reservationId,
+    bool rembourser) =>
+{
+    await service.AnnulerReservationAsync(reservationId, demandeParClient: false, forcerRemboursement: rembourser);
+    return Results.Ok("Réservation annulée par la réception.");
+});
+
+// Endpoint pour le check-in
+app.MapPost("/api/reservations/checkin", async (
+    ReservationService service,
+    GestionHotel.Application.DTOs.CheckInRequestDto dto) =>
+{
+    await service.CheckInAsync(dto);
+    return Results.Ok("Check-in effectué avec succès.");
+});
+
+// Endpoint pour le check-out
+app.MapPost("/api/reservations/checkout", async (
+    ReservationService service,
+    GestionHotel.Application.DTOs.CheckOutRequestDto dto) =>
+{
+    await service.CheckOutAsync(dto.ReservationId);
+    return Results.Ok("Check-out effectué avec succès.");
+});
+
+// Endpoint pour obtenir toutes les réservations actives
+app.MapGet("/api/reservations/actives", async (
+    ReservationService service) =>
+{
+    var actives = await service.GetReservationsActivesAsync();
+    return Results.Ok(actives);
+});
+
 app.Run();

@@ -10,6 +10,8 @@ namespace GestionHotel.Domain.Interfaces
         Task AddAsync(Chambre chambre);
         Task UpdateAsync(Chambre chambre);
         Task DeleteAsync(int id);
+        Task<List<Chambre>> GetChambresDisponiblesAvecEtat(DateTime dateDebut, DateTime dateFin);
+
     }
 
 }
