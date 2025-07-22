@@ -76,22 +76,20 @@ namespace GestionHotel.Application.Services
             };
         }
 
-        public async Task<bool> AnnulerReservationAsync(int reservationId)
+        public async Task AnnulerReservationAsync(int reservationId, bool demandeParClient, bool forcerRemboursement)
         {
             var reservation = await _reservationRepo.GetByIdAsync(reservationId);
+
             if (reservation == null)
-                return false;
+                throw new Exception("Réservation introuvable.");
 
-            var heuresAvantDebut = (reservation.DateDebut - DateTime.Now).TotalHours;
+            var delaiAnnulation = (reservation.DateDebut - DateTime.Now).TotalHours;
 
-            // Règle de remboursement
-            if (heuresAvantDebut < 48)
-                return false; // non remboursable automatiquement
+            var remboursable = forcerRemboursement || (demandeParClient && delaiAnnulation >= 48);
 
             reservation.Statut = StatutReservation.Annulee;
             await _reservationRepo.UpdateAsync(reservation);
-
-            return true;
         }
+
     }
 }
