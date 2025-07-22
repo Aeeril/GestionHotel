@@ -1,11 +1,13 @@
 using GestionHotel.Application.DTOs;
 using GestionHotel.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GestionHotel.Apis.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Receptionniste")]
     public class ChambresController : ControllerBase
     {
         private readonly IChambreRepository _chambreRepo;
@@ -30,7 +32,7 @@ namespace GestionHotel.Apis.Controllers
                 Type = c.Type.ToString(),
                 Tarif = c.Tarif,
                 Capacite = c.Capacite,
-                Etat = c.Etat.ToString() 
+                Etat = c.Etat.ToString()
             });
 
             return Ok(chambresDto);
