@@ -1,4 +1,3 @@
-
 ## GestionHotel – Application de gestion hôtelière
 
 Application ASP.NET Core modulaire permettant la gestion complète d’un hôtel : réservations, chambres, utilisateurs, paiements, notifications par email, et signalements de casse.
@@ -63,49 +62,67 @@ Mailtrap limite à 50 emails par mois pour les comptes gratuits.
 
 ### 📦 Gestion des Chambres
 
-| Méthode | Endpoint                              | Description                          |
-| ------: | ------------------------------------- | ------------------------------------ |
-|     GET | `/api/Chambres`                       | Liste de toutes les chambres         |
-|     GET | `/api/Chambres/disponibles`           | Chambres disponibles                 |
-|     GET | `/api/Chambres/disponibles/reception` | Chambres disponibles (vue réception) |
-|    POST | `/api/Chambres`                       | Créer une chambre                    |
-|     PUT | `/api/Chambres/{id}`                  | Modifier une chambre                 |
-|  DELETE | `/api/Chambres/{id}`                  | Supprimer une chambre                |
+| Méthode | Endpoint                              | Description                          | Rôles requis     |
+| ------: | ------------------------------------- | ------------------------------------ | ---------------- |
+|     GET | `/api/Chambres`                       | Liste de toutes les chambres         | `Receptionniste` |
+|     GET | `/api/Chambres/disponibles`           | Chambres disponibles                 | `Receptionniste` |
+|     GET | `/api/Chambres/disponibles/reception` | Chambres disponibles (vue réception) | `Receptionniste` |
+|    POST | `/api/Chambres`                       | Créer une chambre                    | `Receptionniste` |
+|     PUT | `/api/Chambres/{id}`                  | Modifier une chambre                 | `Receptionniste` |
+|  DELETE | `/api/Chambres/{id}`                  | Supprimer une chambre                | `Receptionniste` |
 
 ---
 
 ### 👥 Gestion des Clients
 
-| Méthode | Endpoint            | Description         |
-| ------: | ------------------- | ------------------- |
-|     GET | `/api/Clients`      | Liste des clients   |
-|    POST | `/api/Clients`      | Ajouter un client   |
-|     PUT | `/api/Clients/{id}` | Modifier un client  |
-|  DELETE | `/api/Clients/{id}` | Supprimer un client |
+| Méthode | Endpoint            | Description         | Rôles requis     |
+| ------: | ------------------- | ------------------- | ---------------- |
+|     GET | `/api/Clients`      | Liste des clients   | `Receptionniste` |
+|    POST | `/api/Clients`      | Ajouter un client   | `Receptionniste` |
+|     PUT | `/api/Clients/{id}` | Modifier un client  | `Receptionniste` |
+|  DELETE | `/api/Clients/{id}` | Supprimer un client | `Receptionniste` |
 
 ---
 
 ### 📅 Réservations
 
-| Méthode | Endpoint                                  | Description                     |
-| ------: | ----------------------------------------- | ------------------------------- |
-|     GET | `/api/Reservations/actives`               | Réservations actives            |
-|    POST | `/api/Reservations`                       | Créer une réservation           |
-|    POST | `/api/Reservations/checkin`               | Check-in d’un client            |
-|    POST | `/api/Reservations/checkout`              | Check-out d’un client           |
-|    POST | `/api/Reservations/annuler/{id}`          | Annuler une réservation         |
-|    POST | `/api/Reservations/annuler-par-reception` | Annulation rapide via réception |
+| Méthode | Endpoint                                  | Description                     | Rôles requis               |
+| ------: | ----------------------------------------- | ------------------------------- | -------------------------- |
+|     GET | `/api/Reservations/actives`               | Réservations actives            | `Receptionniste`           |
+|    POST | `/api/Reservations`                       | Créer une réservation           | `Client`, `Receptionniste` |
+|    POST | `/api/Reservations/checkin`               | Check-in d’un client            | `Receptionniste`           |
+|    POST | `/api/Reservations/checkout`              | Check-out d’un client           | `Receptionniste`           |
+|    POST | `/api/Reservations/annuler/{id}`          | Annuler une réservation         | `Client`, `Receptionniste` |
+|    POST | `/api/Reservations/annuler-par-reception` | Annulation rapide via réception | `Receptionniste`           |
 
 ---
 
 ### 🛠️ Signalements de casse
 
-| Méthode | Endpoint                 | Description                         |
-| ------: | ------------------------ | ----------------------------------- |
-|     GET | `/api/Signalements`      | Liste des signalements              |
-|    POST | `/api/Signalements`      | Signaler une casse                  |
-|     PUT | `/api/Signalements/{id}` | Marquer un signalement comme traité |
-|  DELETE | `/api/Signalements/{id}` | Supprimer un signalement            |
+| Méthode | Endpoint                 | Description                         | Rôles requis                        |
+| ------: | ------------------------ | ----------------------------------- | ----------------------------------- |
+|     GET | `/api/Signalements`      | Liste des signalements              | `Receptionniste`, `PersonnelMenage` |
+|    POST | `/api/Signalements`      | Signaler une casse                  | `Receptionniste`, `PersonnelMenage` |
+|     PUT | `/api/Signalements/{id}` | Marquer un signalement comme traité | `Receptionniste`, `PersonnelMenage` |
+|  DELETE | `/api/Signalements/{id}` | Supprimer un signalement            | `Receptionniste`, `PersonnelMenage` |
+
+---
+
+### 🧹 Gestion du ménage
+
+| Méthode | Endpoint                             | Description                          | Rôles requis      |
+| ------: | ------------------------------------ | ------------------------------------ | ----------------- |
+|     GET | `/api/menage/chambres-a-nettoyer`    | Liste des chambres à nettoyer        | `PersonnelMenage` |
+|    POST | `/api/menage/chambres/{id}/nettoyee` | Marquer une chambre comme nettoyée   | `PersonnelMenage` |
+|    POST | `/api/menage/chambres/{id}/dommage`  | Signaler un dommage dans une chambre | `PersonnelMenage` |
+
+---
+
+### 🔐 Authentification et rôles
+
+| Méthode | Endpoint          | Description                                      | Rôles requis |
+| ------: | ----------------- | ------------------------------------------------ | ------------ |
+|    POST | `/api/auth/login` | Connecte un utilisateur et retourne un token JWT | (public)     |
 
 ---
 
@@ -124,6 +141,14 @@ Services de notifications automatiques exécutés en tâche de fond (`Background
 
 Swagger pour tester tous les endpoints manuellement à l’adresse :
     `http://localhost:5123/swagger`
+
+Pour le cadre de l'exercice, des utilisateurs mocks sont ajoutés à la base de données pour tester le fonctionnement de l'application. 
+
+| Nom            | Email                   | Mot de passe | Rôle            |
+| -------------- | ----------------------- | ------------ | --------------- |
+| receptionniste | receptionniste@test.com | test         | Receptionniste  |
+| client         | client@test.com         | test         | Client          |
+| menage         | menage@test.com         | test         | PersonnelMenage |
 
 ---
 
