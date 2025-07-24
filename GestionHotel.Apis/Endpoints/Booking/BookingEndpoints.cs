@@ -1,4 +1,6 @@
-﻿namespace GestionHotel.Apis.Endpoints.Booking;
+﻿using Microsoft.AspNetCore.Authorization;
+
+namespace GestionHotel.Apis.Endpoints.Booking;
 
 
 public static class BookingEndpoints
@@ -9,7 +11,8 @@ public static class BookingEndpoints
     {
         var group = routes.MapGroup(BASE_URL)
             .WithOpenApi()
-            .WithTags("Booking");
+            .WithTags("Booking")
+            .RequireAuthorization(new AuthorizeAttribute { Roles = "Client" });
 
         group.MapGet("", BookingHandler.GetAvailableRooms)
             .WithName("GetAvailableRooms");

@@ -1,4 +1,5 @@
 using GestionHotel.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GestionHotel.Apis.Endpoints.Menage
@@ -7,7 +8,8 @@ namespace GestionHotel.Apis.Endpoints.Menage
     {
         public static void MapMenageEndpoints(this IEndpointRouteBuilder routes)
         {
-            var group = routes.MapGroup("/api/menage").WithTags("Ménage");
+            var group = routes.MapGroup("/api/menage").WithTags("Ménage")
+                .RequireAuthorization(new AuthorizeAttribute { Roles = "PersonnelMenage" });
 
             group.MapGet("/chambres-a-nettoyer", async (IMenageService menageService) =>
             {
