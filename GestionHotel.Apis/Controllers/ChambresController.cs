@@ -1,6 +1,8 @@
 using GestionHotel.Application.DTOs;
 using GestionHotel.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using GestionHotel.Domain.Entities;
+
 
 namespace GestionHotel.Apis.Controllers
 {
@@ -14,7 +16,7 @@ namespace GestionHotel.Apis.Controllers
         {
             _chambreRepo = chambreRepo;
         }
-
+        
         [HttpGet("disponibles")]
         public async Task<IActionResult> GetChambresDisponibles([FromQuery] DateTime dateDebut, [FromQuery] DateTime dateFin)
         {
@@ -62,6 +64,41 @@ namespace GestionHotel.Apis.Controllers
         {
             var chambres = await _chambreRepo.GetAllAsync();
             return Ok(chambres);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] Chambre chambre)
+        {
+            await _chambreRepo.AddAsync(chambre);
+            return CreatedAtAction(nameof(GetAll), new { id = chambre.Id }, chambre);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] Chambre updatedChambre)
+        {
+            var existing = await _chambreRepo.GetByIdAsync(id);
+            if (existing == null)
+                return NotFound($"Chambre avec l'id {id} non trouvée.");
+
+            existing.Numero = updatedChambre.Numero;
+            existing.Capacite = updatedChambre.Capacite;
+            existing.Type = updatedChambre.Type;
+            existing.Tarif = updatedChambre.Tarif;
+            existing.Etat = updatedChambre.Etat;
+
+            await _chambreRepo.UpdateAsync(existing);
+            return NoContent(); 
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var chambre = await _chambreRepo.GetByIdAsync(id);
+            if (chambre == null)
+                return NotFound($"Chambre avec l'id {id} non trouvée.");
+
+            await _chambreRepo.DeleteAsync(id);
+            return NoContent(); 
         }
     }
 }

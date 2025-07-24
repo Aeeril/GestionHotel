@@ -12,6 +12,7 @@ namespace GestionHotel.Infrastructure.Data
         public DbSet<Reservation> Reservations => Set<Reservation>();
         public DbSet<Utilisateur> Utilisateurs => Set<Utilisateur>();
         public DbSet<Paiement> Paiements => Set<Paiement>();
+        public DbSet<Signalement> Signalements { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
