@@ -4,6 +4,7 @@ using GestionHotel.Infrastructure.Data;
 using GestionHotel.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // EF Core + SQLite
@@ -17,6 +18,10 @@ builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<IUtilisateurRepository, UtilisateurRepository>();
 builder.Services.AddScoped<ReservationService>();
 builder.Services.AddHostedService<NotificationPreSejourService>();
+builder.Services.AddHostedService<NotificationPostSejourService>();
+builder.Services.AddScoped<ISignalementRepository, SignalementRepository>();
+
+
 
 // Swagger + Controllers
 builder.Services.AddControllers(); 

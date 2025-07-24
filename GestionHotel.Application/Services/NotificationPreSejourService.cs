@@ -29,31 +29,33 @@ namespace GestionHotel.Application.Services
                 using var scope = _scopeFactory.CreateScope();
                 var reservationRepository = scope.ServiceProvider.GetRequiredService<IReservationRepository>();
 
-                var maintenant = DateTime.Now; //hors test : var demain = DateTime.Today.AddDays(1);
+                var demain = DateTime.Today.AddDays(1); //Pour test : var maintenant = DateTime.Now; 
 
                 var reservations = await reservationRepository.GetAllAsync();
                 var cibles = reservations
-                    .Where(r => r.DateDebut <= maintenant.AddMinutes(1) && r.Client != null && !string.IsNullOrEmpty(r.Client.Email)) //hors test : .Where(r => r.DateDebut.Date == demain && r.Client != null && !string.IsNullOrEmpty(r.Client.Email))
+                    .Where(r => r.DateDebut.Date == demain && r.Client != null && !string.IsNullOrEmpty(r.Client.Email)) //pour test : .Where(r => r.DateDebut <= maintenant.AddMinutes(1) && r.Client != null && !string.IsNullOrEmpty(r.Client.Email))
                     .ToList();
 
                 foreach (var res in cibles)
                 {
                     try
                     {
+                        var client = res.Client;
+                        if (client == null || string.IsNullOrWhiteSpace(client.Email)) continue;
+
                         await _emailService.SendEmailAsync(
-                            res.Client.Email,
+                            client.Email,
                             "Rappel de votre séjour à l'hôtel",
-                            $"Bonjour {res.Client.Nom},\n\nNous vous rappelons que votre séjour commence demain ({res.DateDebut:dd/MM/yyyy}). À bientôt !"
+                            $"Bonjour {client.Nom ?? "client"},\n\nNous vous rappelons que votre séjour commence demain ({res.DateDebut:dd/MM/yyyy}). À bientôt !"
                         );
-                        _logger.LogInformation($"Rappel envoyé à {res.Client.Email}");
+                        _logger.LogInformation($"Rappel envoyé à {client.Email}");
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, $"Erreur lors de l'envoi du mail à {res.Client.Email}");
+                        _logger.LogWarning($"Email non envoyé : {ex.Message}");
                     }
                 }
-
-                await Task.Delay(TimeSpan.FromSeconds(60), stoppingToken); //hors test : await Task.Delay(TimeSpan.FromHours(24), stoppingToken); // Vérifie tous les jours
+                await Task.Delay(TimeSpan.FromHours(24), stoppingToken); // Pour test : await Task.Delay(TimeSpan.FromSeconds(60), stoppingToken);
             }
         }
     }
