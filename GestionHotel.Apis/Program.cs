@@ -1,3 +1,4 @@
+using GestionHotel.Apis.Endpoints.Auth;
 using GestionHotel.Apis.Endpoints.Menage;
 using GestionHotel.Application.Interfaces;
 using GestionHotel.Application.Services;
@@ -43,16 +44,21 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-    };
+    var keyString = builder.Configuration["Jwt:Key"];
+        if (string.IsNullOrEmpty(keyString))
+        {
+            throw new InvalidOperationException("JWT key is not configured.");
+        }
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString))
+        };
 });
 
 var app = builder.Build();
@@ -65,57 +71,20 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers(); // Toutes les routes sont gérées par les Controllers MVC
 
 app.MapMenageEndpoints();
+app.MapAuthEndpoints();
 
-// Ajout d'utilsateurs test
+// Ajout d'utilisateurs tests
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<HotelDbContext>();
-    if (!dbContext.Utilisateurs.Any())
-    {
-        dbContext.Utilisateurs.AddRange(
-            new GestionHotel.Domain.Entities.Utilisateur
-            {
-                Nom = "receptionniste",
-                Email = "receptionniste@test.com",
-                MotDePasse = "test",
-                Role = GestionHotel.Domain.Entities.RoleUtilisateur.Receptionniste
-            },
-            new GestionHotel.Domain.Entities.Utilisateur
-            {
-                Nom = "client",
-                Email = "client@test.com",
-                MotDePasse = "test",
-                Role = GestionHotel.Domain.Entities.RoleUtilisateur.Client
-            },
-            new GestionHotel.Domain.Entities.Utilisateur
-            {
-                Nom = "menage",
-                Email = "menage@test.com",
-                MotDePasse = "test",
-                Role = GestionHotel.Domain.Entities.RoleUtilisateur.PersonnelMenage
-            }
-        );
-        dbContext.SaveChanges();
-    }
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<HotelDbContext>();
+    DataSeeder.Initialize(context);
 }
-
-app.MapPost("/api/auth/login", async (IAuthService authService, string email, string password) =>
-{
-    try
-    {
-        var token = await authService.Authenticate(email, password);
-        return Results.Ok(new { Token = token });
-    }
-    catch (UnauthorizedAccessException)
-    {
-        return Results.Unauthorized();
-    }
-});
 
 app.Run();

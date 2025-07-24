@@ -1,11 +1,13 @@
 using GestionHotel.Domain.Entities;
 using GestionHotel.Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GestionHotel.Apis.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Receptionniste")]
     public class ClientsController : ControllerBase
     {
         private readonly IClientRepository _repo;

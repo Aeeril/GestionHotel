@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using GestionHotel.Domain.Entities;
 using GestionHotel.Domain.Interfaces;
 using GestionHotel.Application.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Receptionniste,PersonnelMenage")]
 public class SignalementsController : ControllerBase
 {
     private readonly ISignalementRepository _repo;
