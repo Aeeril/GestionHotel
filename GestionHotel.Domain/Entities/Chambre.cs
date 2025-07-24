@@ -36,6 +36,11 @@ namespace GestionHotel.Domain.Entities
 
         [Required]
         public EtatChambre Etat { get; set; }
+
+        [Required]
+        public bool EstPropre { get; set; } = true;
+
+        public string? DommagesSignales { get; set; }
         
     }
 }

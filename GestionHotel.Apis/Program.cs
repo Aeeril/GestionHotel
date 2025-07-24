@@ -1,3 +1,5 @@
+using GestionHotel.Apis.Endpoints.Menage;
+using GestionHotel.Application.Interfaces;
 using GestionHotel.Application.Services;
 using GestionHotel.Domain.Interfaces;
 using GestionHotel.Infrastructure.Data;
@@ -22,6 +24,7 @@ builder.Services.AddHostedService<NotificationPostSejourService>();
 builder.Services.AddScoped<ISignalementRepository, SignalementRepository>();
 
 
+builder.Services.AddScoped<IMenageService, MenageService>();
 
 // Swagger + Controllers
 builder.Services.AddControllers(); 
@@ -41,5 +44,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers(); // Toutes les routes sont gérées par les Controllers MVC
+
+app.MapMenageEndpoints();
 
 app.Run();

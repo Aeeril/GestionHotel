@@ -15,6 +15,8 @@ namespace GestionHotel.Application.DTOs
 
         public int Capacite { get; set; }
 
+        public bool EstPropre { get; set; }
+
         public required string Etat { get; set; }
     }
 }

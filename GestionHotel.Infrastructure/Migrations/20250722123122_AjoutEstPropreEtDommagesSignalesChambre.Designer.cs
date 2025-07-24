@@ -3,6 +3,7 @@ using System;
 using GestionHotel.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GestionHotel.Infrastructure.Migrations
 {
     [DbContext(typeof(HotelDbContext))]
-    partial class HotelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250722123122_AjoutEstPropreEtDommagesSignalesChambre")]
+    partial class AjoutEstPropreEtDommagesSignalesChambre
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
@@ -148,37 +151,6 @@ namespace GestionHotel.Infrastructure.Migrations
                     b.ToTable("Reservations");
                 });
 
-            modelBuilder.Entity("GestionHotel.Domain.Entities.Signalement", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ChambreId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("DateSignalement")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("ReservationId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("Traite")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChambreId");
-
-                    b.HasIndex("ReservationId");
-
-                    b.ToTable("Signalements");
-                });
-
             modelBuilder.Entity("GestionHotel.Domain.Entities.Utilisateur", b =>
                 {
                     b.Property<int>("Id")
@@ -235,23 +207,6 @@ namespace GestionHotel.Infrastructure.Migrations
                     b.Navigation("Client");
 
                     b.Navigation("Paiement");
-                });
-
-            modelBuilder.Entity("GestionHotel.Domain.Entities.Signalement", b =>
-                {
-                    b.HasOne("GestionHotel.Domain.Entities.Chambre", "Chambre")
-                        .WithMany()
-                        .HasForeignKey("ChambreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GestionHotel.Domain.Entities.Reservation", "Reservation")
-                        .WithMany()
-                        .HasForeignKey("ReservationId");
-
-                    b.Navigation("Chambre");
-
-                    b.Navigation("Reservation");
                 });
 #pragma warning restore 612, 618
         }
